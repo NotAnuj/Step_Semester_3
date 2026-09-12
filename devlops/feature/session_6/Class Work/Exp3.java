@@ -1,0 +1,85 @@
+class LibraryMember {
+    protected String memberId;
+    protected int borrowLimit;
+    protected int booksBorrowed;
+    private int[] fineHistory;
+    private int fineCount;
+    private int totalFine;
+
+    public LibraryMember(String memberId, int borrowLimit) {
+        if (memberId == null || memberId.trim().length() < 4 || borrowLimit <= 0) {
+            throw new IllegalArgumentException();
+        }
+
+        this.memberId = memberId;
+        this.borrowLimit = borrowLimit;
+        this.fineHistory = new int[10];
+        this.fineCount = 0;
+        this.totalFine = 0;
+    }
+
+    public void borrowBook() {
+        if (booksBorrowed < borrowLimit) {
+            booksBorrowed++;
+        }
+    }
+
+    public int getBooksBorrowed() {
+        return booksBorrowed;
+    }
+
+    protected void chargeFine(int amount) {
+        if (fineCount < fineHistory.length) {
+            fineHistory[fineCount] = amount;
+            fineCount++;
+            totalFine += amount;
+        }
+    }
+
+    public int[] getFineHistory() {
+        int[] result = new int[fineCount];
+
+        for (int i = 0; i < fineCount; i++) {
+            result[i] = fineHistory[i];
+        }
+
+        return result;
+    }
+
+    public int getTotalFine() {
+        return totalFine;
+    }
+}
+
+class StudentMember extends LibraryMember {
+    private String course;
+
+    public StudentMember(String memberId, int borrowLimit, String course) {
+        super(memberId, borrowLimit);
+        this.course = course;
+    }
+
+    @Override
+    protected void chargeFine(int amount) {
+        super.chargeFine(amount / 2);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        StudentMember s =
+            new StudentMember("STU5", 3, "CSE");
+
+        s.chargeFine(100);
+
+        System.out.println(s.getTotalFine());
+
+        int[] history = s.getFineHistory();
+
+        history[0] = 999;
+
+        System.out.println(
+            java.util.Arrays.toString(s.getFineHistory())
+        );
+    }
+}
